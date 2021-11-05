@@ -55,6 +55,23 @@ export class UserService {
     return ''
   }
 
+  public async updateProfile(request: UserModel): Promise<UserModel> {
+    try {
+      const user: UserEntity = await this.userRepository.findOne({where: {id: request.id}, relations: ['type', 'role']}) as UserEntity
+      let newUserProfile: UserEntity = {...user}
+      newUserProfile.firstName = request.firstName
+      newUserProfile.lastName = request.lastName
+      newUserProfile.details = request.details
+      newUserProfile.phoneNumber = request.phoneNumber
+      newUserProfile.birthday = request.birthday
+      const result: UserEntity = await this.userRepository.save({...user, ...newUserProfile})
+      return this.mapUserEntityToUserModel(result)
+    } catch (error) {
+      console.error(error)
+    }
+    return new UserModel
+  }
+
   private async checkUserNameExist(userName: string): Promise<boolean> {
     const users: Array<UserEntity> = await this.userRepository.find({where: {userName: userName}})
     if (users.length) {
@@ -80,6 +97,8 @@ export class UserService {
       userName: userEntity.userName,
       email: userEntity.email,
       details: userEntity.details,
+      firstName: userEntity.firstName,
+      lastName: userEntity.lastName,
       birthday: userEntity.birthday,
       phoneNumber: userEntity.phoneNumber,
       profilePicture: userEntity.profilePicture,
@@ -99,6 +118,8 @@ export class UserService {
     result.email = request.email
     result.birthday = request.birthDay
     result.phoneNumber = request.phoneNumber
+    result.firstName = request.firstName
+    result.lastName = request.lastName
     return result
   }
 

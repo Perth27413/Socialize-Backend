@@ -104,6 +104,9 @@ ALTER TABLE public."comment" ADD CONSTRAINT comment_fk FOREIGN KEY (post_id) REF
 ALTER TABLE public."comment" ADD owner_id serial NOT NULL;
 ALTER TABLE public."comment" ADD CONSTRAINT comment_fk1 FOREIGN KEY (owner_id) REFERENCES public."user"(id);
 
+ALTER TABLE public."user" ADD first_name varchar NULL;
+ALTER TABLE public."user" ADD last_name varchar NULL;
+
 
 INSERT INTO public."type" ("name")
 	VALUES ('socialize');

@@ -20,6 +20,7 @@ export class UserController {
     this.router.get('/:id', this.getUserById)
     this.router.post('/login', this.login)
     this.router.post('/register', this.register)
+    this.router.post('/update', this.updateProfile)
   }
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
@@ -42,4 +43,10 @@ export class UserController {
     const status: string = await this.userService.register(req.body)
     res.send(status).json()
   }
+
+  public updateProfile = async (req: Request<{}, {}, UserModel>, res: Response<UserModel>): Promise<void> => {
+    const userDetails: UserModel = await this.userService.updateProfile(req.body)
+    res.send(userDetails).json()
+  }
+
 }

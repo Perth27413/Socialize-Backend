@@ -35,6 +35,12 @@ export class UserEntity {
   @Column({name: 'last_login'})
   lastLogin: Date
 
+  @Column({name: 'first_name'})
+  firstName: string
+
+  @Column({name: 'last_name'})
+  lastName: string
+
   @ManyToOne(() => RoleEntity, role => role.id)
   @JoinColumn({name: 'role_id'})
   role: RoleEntity
