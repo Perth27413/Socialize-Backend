@@ -1,6 +1,7 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { UserEntity } from "../database/entities/UserEntity";
 import LoginRequestModel from "../models/LoginRequestModel";
+import RegisterRequestModel from "../models/RegisterRequestModel";
 import UserModel from "../models/UserModel";
 import { UserService } from "../services/UserService";
 
@@ -18,6 +19,7 @@ export class UserController {
     this.router.get('/all', this.getAll)
     this.router.get('/:id', this.getUserById)
     this.router.post('/login', this.login)
+    this.router.post('/register', this.register)
   }
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
@@ -36,4 +38,8 @@ export class UserController {
     res.send(userDetails).json()
   }
   
+  public register = async (req: Request<{}, {}, RegisterRequestModel>, res: Response<string>): Promise<void> => {
+    const status: string = await this.userService.register(req.body)
+    res.send(status).json()
+  }
 }

@@ -1,6 +1,8 @@
 import { getConnection } from 'typeorm'
+import { TypeEntity } from '../database/entities/TypeEntity'
 import { UserEntity } from '../database/entities/UserEntity'
 import LoginRequestModel from '../models/LoginRequestModel'
+import RegisterRequestModel from '../models/RegisterRequestModel'
 import UserModel from '../models/UserModel'
 import { TypeRepository } from '../repository/TypeRepository'
 import { UserRepository } from '../repository/UserRepository'
@@ -38,6 +40,30 @@ export class UserService {
     }
   }
 
+  public async register(request: RegisterRequestModel): Promise<string> {
+    try {
+      const isUserNameExist: boolean = await this.checkUserNameExist(request.username)
+      if (!isUserNameExist) {
+        let newUser: UserEntity = await this.mapRegisterRequestToUserEntity(request) as UserEntity
+        const result: UserEntity = await this.userRepository.save(newUser)
+        console.log(result)
+        if (result.id) return 'Register Successfully'
+      }
+      return 'Username Already Exists'
+    } catch (error) {
+      console.error(error)
+    }
+    return ''
+  }
+
+  private async checkUserNameExist(userName: string): Promise<boolean> {
+    const users: Array<UserEntity> = await this.userRepository.find({where: {userName: userName}})
+    if (users.length) {
+      return true
+    }
+    return false
+  }
+
   private async updateLastLogin(result: UserEntity): Promise<UserEntity> {
     let newResult: UserEntity = result
     newResult.lastLogin = new Date()
@@ -62,6 +88,18 @@ export class UserService {
       roleId: userEntity.role.id,
       typeId: userEntity.type.id
     }
+    return result
+  }
+
+  private async mapRegisterRequestToUserEntity(request: RegisterRequestModel): Promise<UserEntity> {
+    const type: TypeEntity = await this.typeRepository.findOne({where: {id: request.typeId}}) as TypeEntity
+    const result: UserEntity = new UserEntity
+    result.type = type
+    result.userName = request.username
+    result.password = request.password
+    result.email = request.email
+    result.birthday = request.birthDay
+    result.phoneNumber = request.phoneNumber
     return result
   }
 
