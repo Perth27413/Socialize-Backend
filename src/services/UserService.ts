@@ -46,7 +46,6 @@ export class UserService {
       if (!isUserNameExist) {
         let newUser: UserEntity = await this.mapRegisterRequestToUserEntity(request) as UserEntity
         const result: UserEntity = await this.userRepository.save(newUser)
-        console.log(result)
         if (result.id) return 'Register Successfully'
       }
       return 'Username Already Exists'
