@@ -1,5 +1,6 @@
 import express, {Request, Response} from 'express'
 import { createConnection } from "typeorm"
+import { PostController } from './controller/PostController'
 import { TypeController } from './controller/TypeController'
 import { UserController } from './controller/UserController'
 
@@ -7,6 +8,7 @@ class Server {
   private app: express.Application
   private typeController: TypeController
   private userController: UserController
+  private postController: PostController
 
   constructor(){
     this.app = express()
@@ -34,6 +36,7 @@ class Server {
 
     this.typeController = new TypeController()
     this.userController = new UserController()
+    this.postController = new PostController()
 
     this.app.get( "/", (req: Request, res: Response ) => {
       res.send( "Hello world!" )
@@ -41,6 +44,7 @@ class Server {
 
     this.app.use('/api/type/', this.typeController.router)
     this.app.use('/api/user/', this.userController.router)
+    this.app.use('/api/post/', this.postController.router)
 
   }
 

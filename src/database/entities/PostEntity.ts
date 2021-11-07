@@ -13,10 +13,10 @@ export class PostEntity {
   picture: string
 
   @ManyToOne(() => UserEntity, user => user.id)
-  @JoinColumn({name: 'user_id'})
-  owner: number
+  @JoinColumn({name: 'owner_id'})
+  owner: UserEntity
 
-  @Column({name: 'create_at'})
+  @Column({name: 'created_at'})
   createdAt: Date
 
   @Column({name: 'updated_at'})

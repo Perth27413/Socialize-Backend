@@ -106,7 +106,12 @@ ALTER TABLE public."comment" ADD CONSTRAINT comment_fk1 FOREIGN KEY (owner_id) R
 
 ALTER TABLE public."user" ADD first_name varchar NULL;
 ALTER TABLE public."user" ADD last_name varchar NULL;
+ALTER TABLE public.post ADD CONSTRAINT post_fk FOREIGN KEY (owner_id) REFERENCES public."user"(id);
+ALTER TABLE public.post_liked ADD id serial NOT NULL;
+ALTER TABLE public.post_liked ADD CONSTRAINT post_liked_pk PRIMARY KEY (id);
 
+ALTER TABLE public.post_viewed ADD id serial NOT NULL;
+ALTER TABLE public.post_viewed ADD CONSTRAINT post_viewed_pk PRIMARY KEY (id);
 
 INSERT INTO public."type" ("name")
 	VALUES ('socialize');
