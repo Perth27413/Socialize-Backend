@@ -14,12 +14,18 @@ export class PostController {
   }
 
   public routes(){
-    this.router.post('/', this.getAllPostByUserId);
+    this.router.post('/', this.getAllPostByUserId)
+    this.router.post('/like', this.toggleLike)
   }
   
   public getAllPostByUserId = async (req: Request<{}, {}, PostRequestModel>, res: Response<PostPageModel>) => {
     const posts = await this.postService.getAllPostByUserId(req.body)
-    res.send(posts).json();
+    res.send(posts).json()
   } 
+
+  public toggleLike = async (req: Request<{}, {}, PostLikedRequestModel>, res: Response<string>) => {
+    const posts = await this.postService.postLiked(req.body)
+    res.send(posts).json()
+  }
   
 }

@@ -28,6 +28,24 @@ export class CommentService {
     return new CommentPageModel
   }
 
+  public async commentLiked(request: CommentLikedRequestModel): Promise<string> {
+    try {
+      const commentsLiked: Array<CommentLikedEntity> = await this.commentLikedRepository.find({where: {comment: request.commentId, userId: request.userId}, relations: ['comment', 'userId']})
+      if (commentsLiked.length) {
+        this.commentLikedRepository.delete(commentsLiked[0])
+      } else {
+        const liked: CommentLikedEntity = new CommentLikedEntity
+        liked.comment = request.commentId
+        liked.userId = request.userId
+        await this.commentLikedRepository.save(liked)
+      }
+      return 'Comment Like Successed'
+    } catch (error) {
+      console.error(error)
+    }
+    return ''
+  }
+
   private async mapCommentEntityToCommentModel(comments: Array<CommentEntity>, currentUserId: number): Promise<Array<CommentModel>> {
     const results: Array<CommentModel> = []
     for await (const item of comments) {
