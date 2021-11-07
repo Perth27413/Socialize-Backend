@@ -1,18 +1,26 @@
 import { getConnection } from 'typeorm';
 import { CommentEntity } from '../database/entities/CommentEntity';
 import { CommentLikedEntity } from '../database/entities/CommentLikedEntity';
+import { PostEntity } from '../database/entities/PostEntity';
+import { UserEntity } from '../database/entities/UserEntity';
 import CommentModel from '../models/Comments/CommentModel';
 import CommentPageModel from '../models/Comments/CommentPageModel';
 import { CommentLikedRepository } from '../repository/CommentLIkedRepository';
 import { CommentRepository } from '../repository/CommentRepository';
+import { PostRepository } from '../repository/PostRepository';
+import { UserRepository } from '../repository/UserRepository';
 
 export class CommentService {
   private commentRepository: CommentRepository
   private commentLikedRepository: CommentLikedRepository
+  private userRepository: UserRepository
+  private postRepository: PostRepository
 
   constructor() {
     this.commentRepository = getConnection("postgres").getCustomRepository(CommentRepository)
     this.commentLikedRepository = getConnection("postgres").getCustomRepository(CommentLikedRepository)
+    this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
+    this.postRepository = getConnection("postgres").getCustomRepository(PostRepository)
   }
   
   public async getCommentByPostId(request: CommentRequestModel): Promise<CommentPageModel> {
@@ -40,6 +48,22 @@ export class CommentService {
         await this.commentLikedRepository.save(liked)
       }
       return 'Comment Like Successed'
+    } catch (error) {
+      console.error(error)
+    }
+    return ''
+  }
+
+  public async addComment(request: CommentAddRequestModel): Promise<string> {
+    try {
+      const comment: CommentEntity = new CommentEntity
+      comment.contents = request.contents
+      comment.owner = await this.userRepository.findOne({where: {id: request.userId}}) as UserEntity
+      comment.post = await this.postRepository.findOne({where: {id: request.postId}}) as PostEntity
+      comment.createdAt = new Date()
+      comment.updatedAt = new Date()
+      this.commentRepository.save(comment)
+      return 'Comment Successfully'
     } catch (error) {
       console.error(error)
     }

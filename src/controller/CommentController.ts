@@ -13,8 +13,9 @@ export class CommentController {
   }
 
   public routes(){
-    this.router.get('/', this.getCommentByPostId)
+    this.router.post('/', this.getCommentByPostId)
     this.router.post('/like', this.toggleLike)
+    this.router.post('/add', this.addComment)
   }
   
   public getCommentByPostId = async (req: Request<{}, {}, CommentRequestModel>, res: Response<CommentPageModel>) => {
@@ -27,5 +28,9 @@ export class CommentController {
     res.send(comments).json()
   }
 
+  public addComment = async (req: Request<{}, {}, CommentAddRequestModel>, res: Response<string>) => {
+    const comments = await this.commentService.addComment(req.body)
+    res.send(comments).json()
+  }
   
 }

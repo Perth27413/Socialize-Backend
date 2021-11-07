@@ -3,6 +3,7 @@ import { FollowEntity } from '../database/entities/FollowEntity';
 import { PostEntity } from '../database/entities/PostEntity';
 import { PostLikedEntity } from '../database/entities/PostLikedEntity';
 import { PostViewedEntity } from '../database/entities/PostViewedEntity';
+import { UserEntity } from '../database/entities/UserEntity';
 import PostModel from '../models/Posts/PostModel';
 import PostOwnerModel from '../models/Posts/PostOwnerModel';
 import PostPageModel from '../models/Posts/PostPageModel';
@@ -11,17 +12,18 @@ import { FollowRepository } from '../repository/FollowRepository';
 import { PostLikedRepository } from '../repository/PostLikedRepository';
 import { PostRepository } from '../repository/PostRepository';
 import { PostViewedRepository } from '../repository/PostViewedRepository';
+import { UserRepository } from '../repository/UserRepository';
 
 export class PostService {
   private postRepository: PostRepository
-  private followRepository: FollowRepository
+  private userRepository: UserRepository
   private postLikedRepository: PostLikedRepository
   private postViewedRepository: PostViewedRepository
   
 
   constructor() {
     this.postRepository = getConnection("postgres").getCustomRepository(PostRepository)
-    this.followRepository = getConnection("postgres").getCustomRepository(FollowRepository)
+    this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
     this.postLikedRepository = getConnection("postgres").getCustomRepository(PostLikedRepository)
     this.postViewedRepository = getConnection("postgres").getCustomRepository(PostViewedRepository)
   }
@@ -62,6 +64,22 @@ export class PostService {
         this.postLikedRepository.save(liked)
       }
       return 'Post Like Successed'
+    } catch (error) {
+      console.error(error)
+    }
+    return ''
+  }
+
+  public async addPost(request: PostAddRequestModel) {
+    try {
+      const post: PostEntity = new PostEntity
+      post.contents = request.contents
+      post.picture = request.picture.join(',')
+      post.owner = await this.userRepository.findOne({where: {id: request.userId}}) as UserEntity
+      post.createdAt = new Date()
+      post.updatedAt = new Date()
+      this.postRepository.save(post)
+      return 'Add Post Successfully'
     } catch (error) {
       console.error(error)
     }
