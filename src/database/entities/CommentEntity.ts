@@ -9,11 +9,11 @@ export class CommentEntity {
 
   @ManyToOne(() => PostEntity, post => post.id)
   @JoinColumn({name: 'post_id'})
-  post: number
+  post: PostEntity
 
   @ManyToOne(() => UserEntity, user => user.id)
   @JoinColumn({name: 'owner_id'})
-  owner: number
+  owner: UserEntity
 
   @Column({name: 'contents'})
   contents: string
