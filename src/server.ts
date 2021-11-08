@@ -1,4 +1,5 @@
 import express, {Request, Response} from 'express'
+import cors from 'cors'
 import { createConnection } from "typeorm"
 import { CommentController } from './controller/CommentController'
 import { PostController } from './controller/PostController'
@@ -21,6 +22,7 @@ class Server {
   public configuration() {
     this.app.set('port', process.env.PORT || 3000)
     this.app.use(express.json())
+    this.app.use(cors())
   }
 
   public async routes(){
