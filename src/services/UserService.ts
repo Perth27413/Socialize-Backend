@@ -1,19 +1,23 @@
 import { getConnection } from 'typeorm'
+import { RoleEntity } from '../database/entities/RoleEntity'
 import { TypeEntity } from '../database/entities/TypeEntity'
 import { UserEntity } from '../database/entities/UserEntity'
 import LoginRequestModel from '../models/LoginRequestModel'
 import RegisterRequestModel from '../models/RegisterRequestModel'
 import UserModel from '../models/UserModel'
+import { RoleRepository } from '../repository/RoleRepository'
 import { TypeRepository } from '../repository/TypeRepository'
 import { UserRepository } from '../repository/UserRepository'
 
 export class UserService {
   private userRepository: UserRepository
   private typeRepository: TypeRepository
+  private roleRepository: RoleRepository
 
   constructor() {
     this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
     this.typeRepository = getConnection("postgres").getCustomRepository(TypeRepository)
+    this.roleRepository = getConnection("postgres").getCustomRepository(RoleRepository)
   }
   
   public async getAllUser(): Promise<Array<UserEntity>> {
@@ -40,19 +44,18 @@ export class UserService {
     }
   }
 
-  public async register(request: RegisterRequestModel): Promise<string> {
+  public async register(request: RegisterRequestModel): Promise<UserModel> {
     try {
       const isUserNameExist: boolean = await this.checkUserNameExist(request.username)
       if (!isUserNameExist) {
         let newUser: UserEntity = await this.mapRegisterRequestToUserEntity(request) as UserEntity
         const result: UserEntity = await this.userRepository.save(newUser)
-        if (result.id) return 'Register Successfully'
+        if (result.id) this.mapUserEntityToUserModel(result)
       }
-      return 'Username Already Exists'
     } catch (error) {
       console.error(error)
     }
-    return ''
+    return new UserModel
   }
 
   public async updateProfile(request: UserModel): Promise<UserModel> {
@@ -111,6 +114,7 @@ export class UserService {
 
   private async mapRegisterRequestToUserEntity(request: RegisterRequestModel): Promise<UserEntity> {
     const type: TypeEntity = await this.typeRepository.findOne({where: {id: request.typeId}}) as TypeEntity
+    const role: RoleEntity = await this.roleRepository.findOne({where: {id: 1}}) as RoleEntity
     const result: UserEntity = new UserEntity
     result.type = type
     result.userName = request.username
@@ -120,6 +124,7 @@ export class UserService {
     result.phoneNumber = request.phoneNumber
     result.firstName = request.firstName
     result.lastName = request.lastName
+    result.role = role
     return result
   }
 

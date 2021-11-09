@@ -25,7 +25,7 @@ export class UserController {
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
     const users = await this.userService.getAllUser();
-    res.send(users).json();
+    res.send(users).json()
   }
 
   public getUserById = async (req: Request, res: Response<UserEntity>): Promise<void> => {
@@ -39,9 +39,9 @@ export class UserController {
     res.send(userDetails).json()
   }
   
-  public register = async (req: Request<{}, {}, RegisterRequestModel>, res: Response<string>): Promise<void> => {
-    const status: string = await this.userService.register(req.body)
-    res.send(status).json()
+  public register = async (req: Request<{}, {}, RegisterRequestModel>, res: Response<UserModel>): Promise<void> => {
+    const userDetails: UserModel = await this.userService.register(req.body)
+    res.send(userDetails).json()
   }
 
   public updateProfile = async (req: Request<{}, {}, UserModel>, res: Response<UserModel>): Promise<void> => {
