@@ -31,6 +31,7 @@ export class PostService {
   public async getAllPostByUserId(request: PostRequestModel): Promise<PostPageModel> {
     try {
       const pageItem: number = 5
+      const allPosts: Array<PostEntity> = await this.postRepository.find()
       const posts: Array<PostEntity> = await this.postRepository.find({
         relations: ['owner'],
         where: {owner: {id: Not(request.userId)}},
@@ -43,7 +44,7 @@ export class PostService {
       const results: PostPageModel = new PostPageModel()
       results.currentPage = request.page
       results.pageItem = pageItem
-      results.totalPage = Math.ceil(posts.length / pageItem)
+      results.totalPage = Math.ceil(allPosts.length / pageItem)
       results.posts = await this.mapPostEntityToPostResponse(posts, request.userId)
       return results
     } catch (error) {
