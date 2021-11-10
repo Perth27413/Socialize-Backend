@@ -25,7 +25,7 @@ export class CommentService {
   
   public async getCommentByPostId(request: CommentRequestModel): Promise<CommentPageModel> {
     try {
-      let comments: Array<CommentEntity> = await this.commentRepository.find({relations: ['post', 'owner'], where: {post: {id: request.postId}}, order: {createdAt: 'DESC'}})
+      let comments: Array<CommentEntity> = await this.commentRepository.find({relations: ['post', 'owner'], where: {post: {id: request.postId}}, order: {createdAt: 'ASC'}})
       const result: CommentPageModel = new CommentPageModel
       result.postId = request.postId
       result.comments = await this.mapCommentEntityToCommentModel(comments, request.userId)
