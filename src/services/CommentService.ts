@@ -3,6 +3,7 @@ import { CommentEntity } from '../database/entities/CommentEntity';
 import { CommentLikedEntity } from '../database/entities/CommentLikedEntity';
 import { PostEntity } from '../database/entities/PostEntity';
 import { UserEntity } from '../database/entities/UserEntity';
+import CommentLikedResponseModel from '../models/Comments/CommentLikedResponseModel';
 import CommentModel from '../models/Comments/CommentModel';
 import CommentPageModel from '../models/Comments/CommentPageModel';
 import { CommentLikedRepository } from '../repository/CommentLIkedRepository';
@@ -36,7 +37,7 @@ export class CommentService {
     return new CommentPageModel
   }
 
-  public async commentLiked(request: CommentLikedRequestModel): Promise<string> {
+  public async commentLiked(request: CommentLikedRequestModel): Promise<CommentLikedResponseModel> {
     try {
       const commentsLiked: Array<CommentLikedEntity> = await this.commentLikedRepository.find({where: {comment: request.commentId, userId: request.userId}, relations: ['comment', 'userId']})
       if (commentsLiked.length) {
@@ -47,11 +48,17 @@ export class CommentService {
         liked.userId = request.userId
         await this.commentLikedRepository.save(liked)
       }
-      return 'Comment Like Successed'
+      const liked: Array<CommentLikedEntity> = await this.commentLikedRepository.find({where: {comment: request.commentId}, relations: ['comment', 'userId']})
+      const isLiked: boolean = (await this.commentLikedRepository.find({where: {comment: request.commentId, userId: request.userId}, relations: ['comment', 'userId']})).length > 0
+      const result: CommentLikedResponseModel = {
+        isLiked: isLiked,
+        liked: liked.length
+      }
+      return result
     } catch (error) {
       console.error(error)
     }
-    return ''
+    return new CommentLikedResponseModel
   }
 
   public async addComment(request: CommentAddRequestModel): Promise<CommentPageModel> {

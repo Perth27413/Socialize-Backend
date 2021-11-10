@@ -1,4 +1,5 @@
 import { Router, Response, Request } from "express"
+import CommentLikedResponseModel from "../models/Comments/CommentLikedResponseModel";
 import CommentPageModel from "../models/Comments/CommentPageModel";
 import { CommentService } from "../services/CommentService";
 
@@ -23,7 +24,7 @@ export class CommentController {
     res.send(comments).json()
   }
 
-  public toggleLike = async (req: Request<{}, {}, CommentLikedRequestModel>, res: Response<string>) => {
+  public toggleLike = async (req: Request<{}, {}, CommentLikedRequestModel>, res: Response<CommentLikedResponseModel>) => {
     const comments = await this.commentService.commentLiked(req.body)
     res.send(comments).json()
   }
