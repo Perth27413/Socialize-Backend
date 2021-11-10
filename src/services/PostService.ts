@@ -52,22 +52,28 @@ export class PostService {
     return new PostPageModel
   }
 
-  public async postLiked(request: PostLikedRequestModel): Promise<string> {
+  public async postLiked(request: PostLikedRequestModel): Promise<PostLikedReponseModel> {
     try {
       const posts: Array<PostLikedEntity> = await this.postLikedRepository.find({where: {post: request.postId, user: request.userId}, relations: ['post', 'user']})
       if (posts.length) {
-        this.postLikedRepository.delete(posts[0])
+        await this.postLikedRepository.delete(posts[0])
       } else {
         const liked: PostLikedEntity = new PostLikedEntity
         liked.post = request.postId
         liked.user = request.userId
-        this.postLikedRepository.save(liked)
+        await this.postLikedRepository.save(liked)
       }
-      return 'Post Like Successed'
+      const liked: Array<PostLikedEntity> = await this.postLikedRepository.find({where: {post: request.postId}, relations: ['post', 'user']})
+      const isLiked: boolean = (await this.postLikedRepository.find({where: {post: request.postId, user: request.userId}, relations: ['post', 'user']})).length > 0
+      const result: PostLikedReponseModel = {
+        isLiked: isLiked,
+        liked: liked.length
+      }
+      return result
     } catch (error) {
       console.error(error)
     }
-    return ''
+    return new PostLikedReponseModel
   }
 
   public async addPost(request: PostAddRequestModel) {
