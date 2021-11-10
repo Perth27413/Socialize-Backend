@@ -54,7 +54,7 @@ export class CommentService {
     return ''
   }
 
-  public async addComment(request: CommentAddRequestModel): Promise<string> {
+  public async addComment(request: CommentAddRequestModel): Promise<CommentPageModel> {
     try {
       const comment: CommentEntity = new CommentEntity
       comment.contents = request.contents
@@ -62,12 +62,17 @@ export class CommentService {
       comment.post = await this.postRepository.findOne({where: {id: request.postId}}) as PostEntity
       comment.createdAt = new Date()
       comment.updatedAt = new Date()
-      this.commentRepository.save(comment)
-      return 'Comment Successfully'
+      await this.commentRepository.save(comment)
+      const getCommentRequest: CommentRequestModel = {
+        postId: request.postId,
+        userId: request.userId
+      }
+      const result: CommentPageModel = await this.getCommentByPostId(getCommentRequest)
+      return result
     } catch (error) {
       console.error(error)
     }
-    return ''
+    return new CommentPageModel
   }
 
   private async mapCommentEntityToCommentModel(comments: Array<CommentEntity>, currentUserId: number): Promise<Array<CommentModel>> {

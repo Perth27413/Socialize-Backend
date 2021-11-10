@@ -28,7 +28,7 @@ export class CommentController {
     res.send(comments).json()
   }
 
-  public addComment = async (req: Request<{}, {}, CommentAddRequestModel>, res: Response<string>) => {
+  public addComment = async (req: Request<{}, {}, CommentAddRequestModel>, res: Response<CommentPageModel>) => {
     const comments = await this.commentService.addComment(req.body)
     res.send(comments).json()
   }
