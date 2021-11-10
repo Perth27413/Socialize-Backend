@@ -105,7 +105,7 @@ export class PostService {
         this.postViewedRepository.save(postViewed)
         isViewed = true
       }
-      const viewed: Array<PostViewedEntity> = await this.postViewedRepository.find({where: {post: item.id, user: currentUserId}, relations: ['post', 'user']})
+      const viewed: Array<PostViewedEntity> = await this.postViewedRepository.find({where: {post: item.id}, relations: ['post', 'user']})
       let post: PostModel = new PostModel()
       post.id = item.id,
       post.contents = item.contents
