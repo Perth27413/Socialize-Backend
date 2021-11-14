@@ -52,7 +52,7 @@ export class PostService {
       results.currentPage = request.page
       results.pageItem = pageItem
       results.totalPage = Math.ceil(allPosts.length / pageItem)
-      results.posts = await this.mapPostEntityToPostResponse(posts, request.userId)
+      results.posts = await this.mapPostEntityToPostResponse(posts, request.currentUserId)
       return results
     } catch (error) {
       console.error(error)
