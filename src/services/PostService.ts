@@ -38,7 +38,7 @@ export class PostService {
       const allPosts: Array<PostEntity> = await this.postRepository.find()
       const posts: Array<PostEntity> = await this.postRepository.find({
         relations: ['owner'],
-        where: {owner: {id: Not(request.userId)}},
+        where: {owner: {id: request.isCurrent ? request.userId : Not(request.userId)}},
         order: {
           createdAt: 'DESC'
         },

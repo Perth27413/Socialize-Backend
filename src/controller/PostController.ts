@@ -23,7 +23,7 @@ export class PostController {
   public getAllPostByUserId = async (req: Request<{}, {}, PostRequestModel>, res: Response<PostPageModel>) => {
     const posts = await this.postService.getAllPostByUserId(req.body)
     res.send(posts).json()
-  } 
+  }
 
   public toggleLike = async (req: Request<{}, {}, PostLikedRequestModel>, res: Response<PostLikedReponseModel>) => {
     const posts = await this.postService.postLiked(req.body)
