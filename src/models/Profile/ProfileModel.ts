@@ -1,0 +1,11 @@
+class ProfileModel {
+  public userId: number = Number()
+  public firstName: string = String()
+  public lastName: string = String()
+  public details: string = String()
+  public post: number = Number()
+  public followers: number = Number()
+  public following: number = Number()
+}
+
+export default ProfileModel

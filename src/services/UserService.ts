@@ -1,14 +1,17 @@
 import { getConnection } from 'typeorm'
 import { FollowEntity } from '../database/entities/FollowEntity'
+import { PostEntity } from '../database/entities/PostEntity'
 import { RoleEntity } from '../database/entities/RoleEntity'
 import { TypeEntity } from '../database/entities/TypeEntity'
 import { UserEntity } from '../database/entities/UserEntity'
 import PopularResponseModel from '../models/Follows/PopularResponseModel'
 import PopularUserModel from '../models/Follows/PopularUserModel'
 import LoginRequestModel from '../models/LoginRequestModel'
+import ProfileModel from '../models/Profile/ProfileModel'
 import RegisterRequestModel from '../models/RegisterRequestModel'
 import UserModel from '../models/UserModel'
 import { FollowRepository } from '../repository/FollowRepository'
+import { PostRepository } from '../repository/PostRepository'
 import { RoleRepository } from '../repository/RoleRepository'
 import { TypeRepository } from '../repository/TypeRepository'
 import { UserRepository } from '../repository/UserRepository'
@@ -18,12 +21,14 @@ export class UserService {
   private typeRepository: TypeRepository
   private roleRepository: RoleRepository
   private followRepository: FollowRepository
+  private postRepository: PostRepository
 
   constructor() {
     this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
     this.typeRepository = getConnection("postgres").getCustomRepository(TypeRepository)
     this.roleRepository = getConnection("postgres").getCustomRepository(RoleRepository)
     this.followRepository = getConnection("postgres").getCustomRepository(FollowRepository)
+    this.postRepository = getConnection("postgres").getCustomRepository(PostRepository)
   }
   
   public async getAllUser(): Promise<Array<UserEntity>> {
@@ -33,6 +38,28 @@ export class UserService {
   public async getUserById(userId: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.findOne({where: {id: userId}, relations: ['type', 'role']}) || new UserEntity
     return  user
+  }
+
+  public async getProfile(userId: number): Promise<ProfileModel> {
+    try {
+      const user: UserEntity = await this.userRepository.findOne({where: {id: userId}, relations: ['type', 'role']}) as UserEntity
+      const posts: Array<PostEntity> = await this.postRepository.find({where: {owner: {id: userId}}})
+      const following: Array<FollowEntity> = await this.followRepository.find({where: {followed: userId}})
+      const followers: Array<FollowEntity> = await this.followRepository.find({where: {following: userId}})
+      const result: ProfileModel = {
+        userId: user.id,
+        firstName: user.firstName,
+        lastName: user.lastName,
+        details: user.details,
+        post: posts.length,
+        followers: followers.length,
+        following: following.length
+      }
+      return result
+    } catch (error) {
+      console.error(error)
+    }
+    return new ProfileModel
   }
 
   public async getPopular(currentUserId: number): Promise<Array<PopularResponseModel>> {
