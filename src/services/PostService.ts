@@ -1,5 +1,6 @@
 import { getConnection, Not } from 'typeorm';
 import { CommentEntity } from '../database/entities/CommentEntity';
+import { CommentLikedEntity } from '../database/entities/CommentLikedEntity';
 import { FollowEntity } from '../database/entities/FollowEntity';
 import { PostEntity } from '../database/entities/PostEntity';
 import { PostLikedEntity } from '../database/entities/PostLikedEntity';
@@ -9,6 +10,7 @@ import PostModel from '../models/Posts/PostModel';
 import PostOwnerModel from '../models/Posts/PostOwnerModel';
 import PostPageModel from '../models/Posts/PostPageModel';
 import PostRequestModel from '../models/Posts/PostRequestModel';
+import { CommentLikedRepository } from '../repository/CommentLIkedRepository';
 import { CommentRepository } from '../repository/CommentRepository';
 import { FollowRepository } from '../repository/FollowRepository';
 import { PostLikedRepository } from '../repository/PostLikedRepository';
@@ -22,7 +24,7 @@ export class PostService {
   private postLikedRepository: PostLikedRepository
   private postViewedRepository: PostViewedRepository
   private commentRepository: CommentRepository
-  
+  private commentLikedRepository: CommentLikedRepository
 
   constructor() {
     this.postRepository = getConnection("postgres").getCustomRepository(PostRepository)
@@ -30,6 +32,7 @@ export class PostService {
     this.postLikedRepository = getConnection("postgres").getCustomRepository(PostLikedRepository)
     this.postViewedRepository = getConnection("postgres").getCustomRepository(PostViewedRepository)
     this.commentRepository = getConnection("postgres").getCustomRepository(CommentRepository)
+    this.commentLikedRepository = getConnection("postgres").getCustomRepository(CommentLikedRepository)
   }
   
   public async getAllPostByUserId(request: PostRequestModel): Promise<PostPageModel> {
@@ -65,6 +68,10 @@ export class PostService {
       const postLiked: Array<PostLikedEntity> = await this.postLikedRepository.find({where: {post: postId}})
       const postViewed: Array<PostViewedEntity> = await this.postViewedRepository.find({where: {post: postId}})
       const comments: Array<CommentEntity> = await this.commentRepository.find({where: {post: postId}})
+      for await (const item of comments) {
+        const commentliked: Array<CommentLikedEntity> = await this.commentLikedRepository.find({where: {comment: item.id}})
+        await this.commentLikedRepository.remove(commentliked)
+      }
       const post: PostEntity = await this.postRepository.findOne({where: {id: postId}, relations: ['owner']}) as PostEntity
       await this.postLikedRepository.remove(postLiked)
       await this.postViewedRepository.remove(postViewed)
