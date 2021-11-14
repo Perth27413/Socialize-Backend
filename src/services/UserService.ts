@@ -48,6 +48,7 @@ export class UserService {
       const followers: Array<FollowEntity> = await this.followRepository.find({where: {following: userId}})
       const result: ProfileModel = {
         userId: user.id,
+        profilePicture: user.profilePicture,
         firstName: user.firstName,
         lastName: user.lastName,
         details: user.details,
