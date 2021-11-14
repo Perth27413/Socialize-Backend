@@ -17,6 +17,7 @@ export class PostController {
     this.router.post('/', this.getAllPostByUserId)
     this.router.post('/like', this.toggleLike)
     this.router.post('/add', this.addPost)
+    this.router.post('/delete', this.deletePost)
   }
 
   public getAllPostByUserId = async (req: Request<{}, {}, PostRequestModel>, res: Response<PostPageModel>) => {
@@ -31,6 +32,12 @@ export class PostController {
 
   public addPost = async (req: Request<{}, {}, PostAddRequestModel>, res: Response<string>) => {
     const posts = await this.postService.addPost(req.body)
+    res.send(posts).json()
+  }
+
+  public deletePost = async (req: Request, res: Response<string>) => {
+    const postId: number = Number(req.query.postId)
+    const posts = await this.postService.deletePost(postId)
     res.send(posts).json()
   }
 

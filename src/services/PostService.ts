@@ -1,4 +1,5 @@
 import { getConnection, Not } from 'typeorm';
+import { CommentEntity } from '../database/entities/CommentEntity';
 import { FollowEntity } from '../database/entities/FollowEntity';
 import { PostEntity } from '../database/entities/PostEntity';
 import { PostLikedEntity } from '../database/entities/PostLikedEntity';
@@ -8,6 +9,7 @@ import PostModel from '../models/Posts/PostModel';
 import PostOwnerModel from '../models/Posts/PostOwnerModel';
 import PostPageModel from '../models/Posts/PostPageModel';
 import PostRequestModel from '../models/Posts/PostRequestModel';
+import { CommentRepository } from '../repository/CommentRepository';
 import { FollowRepository } from '../repository/FollowRepository';
 import { PostLikedRepository } from '../repository/PostLikedRepository';
 import { PostRepository } from '../repository/PostRepository';
@@ -19,6 +21,7 @@ export class PostService {
   private userRepository: UserRepository
   private postLikedRepository: PostLikedRepository
   private postViewedRepository: PostViewedRepository
+  private commentRepository: CommentRepository
   
 
   constructor() {
@@ -26,6 +29,7 @@ export class PostService {
     this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
     this.postLikedRepository = getConnection("postgres").getCustomRepository(PostLikedRepository)
     this.postViewedRepository = getConnection("postgres").getCustomRepository(PostViewedRepository)
+    this.commentRepository = getConnection("postgres").getCustomRepository(CommentRepository)
   }
   
   public async getAllPostByUserId(request: PostRequestModel): Promise<PostPageModel> {
@@ -51,6 +55,23 @@ export class PostService {
       console.error(error)
     }
     return new PostPageModel
+  }
+
+  public async deletePost(postId: number): Promise<string> {
+    try {
+      const postLiked: Array<PostLikedEntity> = await this.postLikedRepository.find({where: {post: postId}})
+      const postViewed: Array<PostViewedEntity> = await this.postViewedRepository.find({where: {post: postId}})
+      const comments: Array<CommentEntity> = await this.commentRepository.find({where: {post: postId}})
+      const post: PostEntity = await this.postRepository.findOne({where: {id: postId}, relations: ['owner']}) as PostEntity
+      await this.postLikedRepository.remove(postLiked)
+      await this.postViewedRepository.remove(postViewed)
+      await this.commentRepository.remove(comments)
+      await this.postRepository.remove(post)
+      return 'success'
+    } catch (error) {
+      console.error(error)
+    }
+    return ''
   }
 
   public async postLiked(request: PostLikedRequestModel): Promise<PostLikedReponseModel> {

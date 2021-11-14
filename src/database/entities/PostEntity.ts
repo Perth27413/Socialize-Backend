@@ -12,7 +12,7 @@ export class PostEntity {
   @Column({name: 'picture'})
   picture: string
 
-  @ManyToOne(() => UserEntity, user => user.id)
+  @ManyToOne(() => UserEntity, user => user.id, {cascade: true,onDelete: 'CASCADE'})
   @JoinColumn({name: 'owner_id'})
   owner: UserEntity
 
