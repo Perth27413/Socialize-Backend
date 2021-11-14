@@ -1,5 +1,6 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { UserEntity } from "../database/entities/UserEntity";
+import PopularResponseModel from "../models/Follows/PopularResponseModel";
 import LoginRequestModel from "../models/LoginRequestModel";
 import RegisterRequestModel from "../models/RegisterRequestModel";
 import UserModel from "../models/UserModel";
@@ -17,6 +18,7 @@ export class UserController {
   
   public routes(){
     this.router.get('/all', this.getAll)
+    this.router.get('/popular', this.getPopular)
     this.router.get('/:id', this.getUserById)
     this.router.post('/login', this.login)
     this.router.post('/register', this.register)
@@ -24,7 +26,13 @@ export class UserController {
   }
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
-    const users = await this.userService.getAllUser();
+    const users = await this.userService.getAllUser()
+    res.send(users).json()
+  }
+
+  public getPopular = async (req: Request, res: Response<Array<PopularResponseModel>>): Promise<void> => {
+    const currentUserId: number = Number(req.query.userId)
+    const users = await this.userService.getPopular(currentUserId)
     res.send(users).json()
   }
 

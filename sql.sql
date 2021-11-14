@@ -114,6 +114,9 @@ ALTER TABLE public.post_viewed ADD id serial NOT NULL;
 ALTER TABLE public.post_viewed ADD CONSTRAINT post_viewed_pk PRIMARY KEY (id);
 ALTER TABLE public.comment_liked ADD id serial NOT NULL;
 ALTER TABLE public.comment_liked ADD CONSTRAINT comment_liked_pk PRIMARY KEY (id);
+ALTER TABLE public.follow ADD id serial NOT NULL;
+ALTER TABLE public.follow ADD CONSTRAINT follow_pk PRIMARY KEY (id);
+
 
 INSERT INTO public."type" ("name")
 	VALUES ('socialize');

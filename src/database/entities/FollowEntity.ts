@@ -7,11 +7,11 @@ export class FollowEntity {
   id: number
 
   @ManyToOne(() => UserEntity, user => user.id)
-  @JoinColumn({name: 'user_id'})
-  following: number
+  @JoinColumn({name: 'following'})
+  following: UserEntity
 
   @ManyToOne(() => UserEntity, user => user.id)
-  @JoinColumn({name: 'user_id'})
-  followed: number
+  @JoinColumn({name: 'followed'})
+  followed: UserEntity
 
 }

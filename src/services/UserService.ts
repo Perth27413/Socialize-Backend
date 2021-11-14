@@ -1,10 +1,14 @@
 import { getConnection } from 'typeorm'
+import { FollowEntity } from '../database/entities/FollowEntity'
 import { RoleEntity } from '../database/entities/RoleEntity'
 import { TypeEntity } from '../database/entities/TypeEntity'
 import { UserEntity } from '../database/entities/UserEntity'
+import PopularResponseModel from '../models/Follows/PopularResponseModel'
+import PopularUserModel from '../models/Follows/PopularUserModel'
 import LoginRequestModel from '../models/LoginRequestModel'
 import RegisterRequestModel from '../models/RegisterRequestModel'
 import UserModel from '../models/UserModel'
+import { FollowRepository } from '../repository/FollowRepository'
 import { RoleRepository } from '../repository/RoleRepository'
 import { TypeRepository } from '../repository/TypeRepository'
 import { UserRepository } from '../repository/UserRepository'
@@ -13,11 +17,13 @@ export class UserService {
   private userRepository: UserRepository
   private typeRepository: TypeRepository
   private roleRepository: RoleRepository
+  private followRepository: FollowRepository
 
   constructor() {
     this.userRepository = getConnection("postgres").getCustomRepository(UserRepository)
     this.typeRepository = getConnection("postgres").getCustomRepository(TypeRepository)
     this.roleRepository = getConnection("postgres").getCustomRepository(RoleRepository)
+    this.followRepository = getConnection("postgres").getCustomRepository(FollowRepository)
   }
   
   public async getAllUser(): Promise<Array<UserEntity>> {
@@ -27,6 +33,54 @@ export class UserService {
   public async getUserById(userId: number): Promise<UserEntity> {
     const user: UserEntity = await this.userRepository.findOne({where: {id: userId}, relations: ['type', 'role']}) || new UserEntity
     return  user
+  }
+
+  public async getPopular(currentUserId: number): Promise<Array<PopularResponseModel>> {
+    try {
+      const follows: Array<FollowEntity> = await this.followRepository.find({relations: ['following', 'followed']})
+      const popularLists: Array<PopularUserModel> = await this.findPopular(follows, currentUserId)
+      return this.mapPopularToResponse(popularLists)
+    } catch (error) {
+      console.error(error)
+    }
+    return []
+  }
+
+  private async findPopular(follows: Array<FollowEntity>, currentUserId: number): Promise<Array<PopularUserModel>> {
+    let popularList: Array<PopularUserModel> = []
+    for await (const item of follows) {
+      const currentFollows: Array<FollowEntity> = await this.followRepository.find({where: {following: item.following, followed: currentUserId}})
+      if (!currentFollows.length) {
+        const index: number = popularList.findIndex(i => i.user.id === item.following.id)
+        if (index >= 0) {
+          popularList[index].count = popularList[index].count + 1
+        } else {
+          let follow: PopularUserModel = {
+            user: item.following,
+            count: 1
+          }
+          popularList.push(follow)
+        }
+      }
+    }
+    return popularList
+  }
+
+  private mapPopularToResponse(popularList: Array<PopularUserModel>): Array<PopularResponseModel> {
+    let results: Array<PopularResponseModel> = []
+    popularList.forEach((item: PopularUserModel, index: number) => {
+      if (index <= 5) {
+        const user: PopularResponseModel = {
+          userId: item.user.id,
+          firstName: item.user.firstName,
+          lastName: item.user.lastName,
+          details: item.user.details,
+          isFollow: false
+        }
+        results.push(user)
+      }
+    })
+    return results
   }
 
   public async login(request: LoginRequestModel): Promise<UserModel> {
