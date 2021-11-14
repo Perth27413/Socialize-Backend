@@ -35,7 +35,10 @@ export class PostService {
   public async getAllPostByUserId(request: PostRequestModel): Promise<PostPageModel> {
     try {
       const pageItem: number = 5
-      const allPosts: Array<PostEntity> = await this.postRepository.find()
+      let allPosts: Array<PostEntity> = await this.postRepository.find()
+      if (request.isCurrent) {
+        allPosts = await this.postRepository.find({where: {owner: {id: request.userId}}})
+      }
       const posts: Array<PostEntity> = await this.postRepository.find({
         relations: ['owner'],
         where: {owner: {id: request.isCurrent ? request.userId : Not(request.userId)}},
