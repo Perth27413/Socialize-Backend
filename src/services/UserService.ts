@@ -4,6 +4,7 @@ import { PostEntity } from '../database/entities/PostEntity'
 import { RoleEntity } from '../database/entities/RoleEntity'
 import { TypeEntity } from '../database/entities/TypeEntity'
 import { UserEntity } from '../database/entities/UserEntity'
+import FollowRequestModel from '../models/Follows/FollowRequestModel'
 import PopularResponseModel from '../models/Follows/PopularResponseModel'
 import PopularUserModel from '../models/Follows/PopularUserModel'
 import LoginRequestModel from '../models/LoginRequestModel'
@@ -63,6 +64,22 @@ export class UserService {
       console.error(error)
     }
     return new ProfileModel
+  }
+
+  public async toggleFollow(request: FollowRequestModel) {
+    try {
+      let follows: Array<FollowEntity> = await this.followRepository.find({where: {followed: request.followed, following: request.following}})
+      if (follows.length) {
+        await this.followRepository.remove(follows[0])
+      } else {
+        let newFollow: FollowEntity = new FollowEntity
+        newFollow.followed = await this.userRepository.findOne({where: {id: request.followed}, relations: ['type', 'role']}) as UserEntity
+        newFollow.following = await this.userRepository.findOne({where: {id: request.following}, relations: ['type', 'role']}) as UserEntity
+        await this.followRepository.save(newFollow)
+      }
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   public async getPopular(currentUserId: number): Promise<Array<PopularResponseModel>> {

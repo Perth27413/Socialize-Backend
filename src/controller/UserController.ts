@@ -1,5 +1,6 @@
 import { Router, Response, Request, NextFunction } from "express";
 import { UserEntity } from "../database/entities/UserEntity";
+import FollowRequestModel from "../models/Follows/FollowRequestModel";
 import PopularResponseModel from "../models/Follows/PopularResponseModel";
 import LoginRequestModel from "../models/LoginRequestModel";
 import ProfileModel from "../models/Profile/ProfileModel";
@@ -25,6 +26,7 @@ export class UserController {
     this.router.post('/login', this.login)
     this.router.post('/register', this.register)
     this.router.post('/update', this.updateProfile)
+    this.router.post('/follow', this.toggleFollow)
   }
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
@@ -43,6 +45,12 @@ export class UserController {
     const currentId: number = Number(req.query.currentUserId)
     const user = await this.userService.getProfile(userId, currentId)
     res.send(user).json()
+  }
+
+  public toggleFollow = async (req: Request<{}, {}, FollowRequestModel>, res: Response<ProfileModel>): Promise<void> => {
+    const user = await this.userService.toggleFollow(req.body)
+    const response = await this.userService.getProfile(req.body.following, req.body.followed)
+    res.send(response).json()
   }
 
   public getUserById = async (req: Request, res: Response<UserEntity>): Promise<void> => {
