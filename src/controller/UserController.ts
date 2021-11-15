@@ -26,6 +26,7 @@ export class UserController {
     this.router.post('/login', this.login)
     this.router.post('/register', this.register)
     this.router.post('/update', this.updateProfile)
+    this.router.post('/update/profile', this.updateProfilePicture)
     this.router.post('/follow', this.toggleFollow)
     this.router.post('/following', this.getFollowingByUserId)
   }
@@ -78,6 +79,11 @@ export class UserController {
 
   public updateProfile = async (req: Request<{}, {}, UserModel>, res: Response<UserModel>): Promise<void> => {
     const userDetails: UserModel = await this.userService.updateProfile(req.body)
+    res.send(userDetails).json()
+  }
+
+  public updateProfilePicture = async (req: Request<{}, {}, UserModel>, res: Response<UserModel>): Promise<void> => {
+    const userDetails: UserModel = await this.userService.updateProfilePicture(req.body)
     res.send(userDetails).json()
   }
 

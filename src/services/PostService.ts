@@ -10,6 +10,7 @@ import PostModel from '../models/Posts/PostModel';
 import PostOwnerModel from '../models/Posts/PostOwnerModel';
 import PostPageModel from '../models/Posts/PostPageModel';
 import PostRequestModel from '../models/Posts/PostRequestModel';
+import UserModel from '../models/UserModel';
 import { CommentLikedRepository } from '../repository/CommentLIkedRepository';
 import { CommentRepository } from '../repository/CommentRepository';
 import { FollowRepository } from '../repository/FollowRepository';

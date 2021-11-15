@@ -177,6 +177,19 @@ export class UserService {
     return new UserModel
   }
 
+  public async updateProfilePicture(request: UserModel): Promise<UserModel> {
+    try {
+      const user: UserEntity = await this.userRepository.findOne({where: {id: request.id}, relations: ['type', 'role']}) as UserEntity
+      const newDetails: UserEntity = {...user}
+      newDetails.profilePicture = request.profilePicture
+      const response: UserEntity = await this.userRepository.save({...user, ...newDetails})
+      return this.mapUserEntityToUserModel(response)
+    } catch (error) {
+      console.error(error)
+    }
+    return new UserModel
+  } 
+
   public async updateProfile(request: UserModel): Promise<UserModel> {
     try {
       const user: UserEntity = await this.userRepository.findOne({where: {id: request.id}, relations: ['type', 'role']}) as UserEntity
