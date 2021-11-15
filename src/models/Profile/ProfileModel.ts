@@ -7,6 +7,7 @@ class ProfileModel {
   public post: number = Number()
   public followers: number = Number()
   public following: number = Number()
+  public isFollow: boolean = Boolean()
 }
 
 export default ProfileModel

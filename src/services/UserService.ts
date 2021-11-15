@@ -40,12 +40,13 @@ export class UserService {
     return  user
   }
 
-  public async getProfile(userId: number): Promise<ProfileModel> {
+  public async getProfile(userId: number, currentUserId: number): Promise<ProfileModel> {
     try {
       const user: UserEntity = await this.userRepository.findOne({where: {id: userId}, relations: ['type', 'role']}) as UserEntity
       const posts: Array<PostEntity> = await this.postRepository.find({where: {owner: {id: userId}}})
       const following: Array<FollowEntity> = await this.followRepository.find({where: {followed: userId}})
       const followers: Array<FollowEntity> = await this.followRepository.find({where: {following: userId}})
+      const isFollow: boolean = (await this.followRepository.find({where: {following: userId, followed: currentUserId}})).length > 0 
       const result: ProfileModel = {
         userId: user.id,
         profilePicture: user.profilePicture,
@@ -54,7 +55,8 @@ export class UserService {
         details: user.details,
         post: posts.length,
         followers: followers.length,
-        following: following.length
+        following: following.length,
+        isFollow: isFollow
       }
       return result
     } catch (error) {
