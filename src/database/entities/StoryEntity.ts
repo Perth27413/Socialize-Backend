@@ -13,8 +13,8 @@ export class StoryEntity {
   picture: string
 
   @ManyToOne(() => UserEntity, user => user.id)
-  @JoinColumn({name: 'user_id'})
-  owner: number
+  @JoinColumn({name: 'owner_id'})
+  owner: UserEntity
 
   @Column({name: 'created_at'})
   createdAt: Date

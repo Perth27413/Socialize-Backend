@@ -5,6 +5,7 @@ import { CommentController } from './controller/CommentController'
 import { PostController } from './controller/PostController'
 import { TypeController } from './controller/TypeController'
 import { UserController } from './controller/UserController'
+import { StoryController } from './controller/StoryController'
 
 class Server {
   private app: express.Application
@@ -12,6 +13,7 @@ class Server {
   private userController: UserController
   private postController: PostController
   private commentController: CommentController
+  private storyController: StoryController
 
   constructor(){
     this.app = express()
@@ -42,6 +44,7 @@ class Server {
     this.userController = new UserController()
     this.postController = new PostController()
     this.commentController = new CommentController()
+    this.storyController = new StoryController()
 
     this.app.get( "/", (req: Request, res: Response ) => {
       res.send( "Hello world!" )
@@ -51,6 +54,7 @@ class Server {
     this.app.use('/api/user/', this.userController.router)
     this.app.use('/api/post/', this.postController.router)
     this.app.use('/api/comment/', this.commentController.router)
+    this.app.use('/api/story/', this.storyController.router)
 
   }
 
