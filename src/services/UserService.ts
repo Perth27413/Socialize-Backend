@@ -66,6 +66,21 @@ export class UserService {
     return new ProfileModel
   }
 
+  public async getFollowingByUserId(userId: number): Promise<Array<ProfileModel>> {
+    try {
+      const result: Array<ProfileModel> = []
+      const followLists: Array<FollowEntity> = await this.followRepository.find({where: {followed: userId}, relations: ['following', 'followed']})
+      for await (const item of followLists) {
+        let follow: ProfileModel = await this.getProfile(item.following.id, userId)
+        result.push(follow)
+      }
+      return result
+    } catch (error) {
+      console.error(error)
+    }
+    return []
+  }  
+
   public async toggleFollow(request: FollowRequestModel) {
     try {
       let follows: Array<FollowEntity> = await this.followRepository.find({where: {followed: request.followed, following: request.following}})

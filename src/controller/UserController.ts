@@ -27,6 +27,7 @@ export class UserController {
     this.router.post('/register', this.register)
     this.router.post('/update', this.updateProfile)
     this.router.post('/follow', this.toggleFollow)
+    this.router.post('/following', this.getFollowingByUserId)
   }
   
   public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
@@ -44,6 +45,12 @@ export class UserController {
     const userId: number = Number(req.query.userId)
     const currentId: number = Number(req.query.currentUserId)
     const user = await this.userService.getProfile(userId, currentId)
+    res.send(user).json()
+  }
+
+  public getFollowingByUserId = async (req: Request, res: Response<Array<ProfileModel>>): Promise<void> => {
+    const userId: number = Number(req.query.userId)
+    const user = await this.userService.getFollowingByUserId(userId)
     res.send(user).json()
   }
 
