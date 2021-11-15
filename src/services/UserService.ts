@@ -114,14 +114,16 @@ export class UserService {
       const currentFollows: Array<FollowEntity> = await this.followRepository.find({where: {following: item.following, followed: currentUserId}})
       if (!currentFollows.length) {
         const index: number = popularList.findIndex(i => i.user.id === item.following.id)
-        if (index >= 0) {
-          popularList[index].count = popularList[index].count + 1
-        } else {
-          let follow: PopularUserModel = {
-            user: item.following,
-            count: 1
+        if (item.following.id !== currentUserId) {
+          if (index >= 0) {
+            popularList[index].count = popularList[index].count + 1
+          } else {
+            let follow: PopularUserModel = {
+              user: item.following,
+              count: 1
+            }
+            popularList.push(follow)
           }
-          popularList.push(follow)
         }
       }
     }
