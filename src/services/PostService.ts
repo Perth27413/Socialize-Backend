@@ -139,6 +139,7 @@ export class PostService {
         isViewed = true
       }
       const viewed: Array<PostViewedEntity> = await this.postViewedRepository.find({where: {post: item.id}, relations: ['post', 'user']})
+      const commentList: Array<CommentEntity> = await this.commentRepository.find({where: {post: {id: item.id}}})
       let post: PostModel = new PostModel()
       post.id = item.id,
       post.contents = item.contents
@@ -155,6 +156,7 @@ export class PostService {
         details: item.owner.details ?? '',
         profilePicture: item.owner.profilePicture ?? ''
       }
+      post.comment = commentList.length
       results.push(post)
     }
     return results
