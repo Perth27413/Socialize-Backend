@@ -134,6 +134,7 @@ export class UserService {
       if (index <= 5) {
         const user: PopularResponseModel = {
           userId: item.user.id,
+          profilePicture: item.user.profilePicture,
           firstName: item.user.firstName,
           lastName: item.user.lastName,
           details: item.user.details,
