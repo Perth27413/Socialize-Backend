@@ -40,7 +40,8 @@ export class UserController {
 
   public getProfileById = async (req: Request, res: Response<ProfileModel>): Promise<void> => {
     const userId: number = Number(req.query.userId)
-    const user = await this.userService.getProfile(userId)
+    const currentId: number = Number(req.query.currentUserId)
+    const user = await this.userService.getProfile(userId, currentId)
     res.send(user).json()
   }
 
