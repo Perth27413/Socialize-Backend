@@ -200,6 +200,12 @@ export class UserService {
 
   public async register(request: RegisterRequestModel): Promise<UserModel> {
     try {
+      if (request.typeId === 2) {
+        const user: Array<UserEntity> = await this.userRepository.find({where: {email: request.email, type: {id: request.typeId}}})
+        if (user.length) {
+          return this.mapUserEntityToUserModel(user[0])
+        }
+      }
       let isUserNameExist: boolean = false
       if (request.username) {
         isUserNameExist = await this.checkUserNameExist(request.username)
