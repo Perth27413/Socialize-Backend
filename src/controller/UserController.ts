@@ -36,9 +36,9 @@ export class UserController {
     res.send(users).json()
   }
 
-  public getPopular = async (req: Request, res: Response<Array<PopularResponseModel>>): Promise<void> => {
+  public getPopular = async (req: Request, res: Response<Array<UserModel>>): Promise<void> => {
     const currentUserId: number = Number(req.query.userId)
-    const users = await this.userService.getPopular(currentUserId)
+    const users = await this.userService.getPeopleMayKnow(currentUserId)
     res.send(users).json()
   }
 
