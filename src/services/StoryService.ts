@@ -19,7 +19,7 @@ export class StoryService {
   public async getStory(): Promise<Array<StoryModel>> {
     try {
       const results: Array<StoryModel> = []
-      const storyList: Array<StoryEntity> = await this.storyRepository.find({relations: ['owner']})
+      const storyList: Array<StoryEntity> = await this.storyRepository.find({relations: ['owner'], order: {id: 'DESC'}})
       for (const item of storyList) {
         const user: UserEntity = await this.userRepository.findOne({where: {id: item.owner.id}, relations: ['role', 'type']}) as UserEntity
         let story: StoryModel = {
