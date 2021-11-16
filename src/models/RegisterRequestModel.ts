@@ -7,6 +7,7 @@ class RegisterRequestModel {
   public phoneNumber: string = String()
   public birthDay: Date = new Date()
   public typeId: number = Number()
+  public profilePicture: string = String()
 }
 
 export default RegisterRequestModel
