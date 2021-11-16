@@ -284,6 +284,7 @@ export class UserService {
     const role: RoleEntity = await this.roleRepository.findOne({where: {id: 1}}) as RoleEntity
     const result: UserEntity = new UserEntity
     result.type = type
+    result.profilePicture = '/assets/image/default.jpg'
     result.userName = request.username
     result.password = request.password
     result.email = request.email
