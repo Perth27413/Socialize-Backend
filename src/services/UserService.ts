@@ -105,19 +105,31 @@ export class UserService {
 
   public async getPeopleMayKnow(currentUserId: number): Promise<Array<UserModel>> {
     try {
-      const allUser: Array<UserModel> = await this.getAllUser()
-      for await (const [index, item] of allUser.entries()) {
+      let allUser: Array<UserModel> = await this.getAllUser()
+      const removeIndexs: Array<number> = []
+      for await (const item of allUser) {
         const follow: Array<FollowEntity> = await this.followRepository.find({where: {following: {id: item.id}, followed: {id: currentUserId}}})
         if (follow.length || item.id === currentUserId) {
-          allUser.splice(index, 1)
+          let removeIndex: number = allUser.findIndex(it => it.id === item.id)
+          removeIndexs.push(removeIndex)
         }
       }
+      allUser = this.filterLists(allUser, removeIndexs)
       if (allUser.length >= 10) return allUser.slice(0, 11)
       return allUser
     } catch (error) {
       console.error(error)
     }
     return []
+  }
+
+  private filterLists(allUser: Array<UserModel>, removeIndexs: Array<number>): Array<UserModel> {
+    const results: Array<UserModel> = [...allUser]
+    removeIndexs = removeIndexs.reverse()
+    removeIndexs.forEach(item => {
+      results.splice(item, 1)
+    })
+    return results
   }
 
   public async getPopular(currentUserId: number): Promise<Array<PopularResponseModel>> {
