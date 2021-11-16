@@ -32,8 +32,14 @@ export class UserService {
     this.postRepository = getConnection("postgres").getCustomRepository(PostRepository)
   }
   
-  public async getAllUser(): Promise<Array<UserEntity>> {
-    return await this.userRepository.find({relations: ['type', 'role']}) || new UserEntity
+  public async getAllUser(): Promise<Array<UserModel>> {
+    const userList: Array<UserEntity> = await this.userRepository.find({relations: ['type', 'role']})
+    const results: Array<UserModel> = []
+    for await (const item of userList) {
+      let user: UserModel = this.mapUserEntityToUserModel(item)
+      results.push(user)
+    }
+    return  results
   }
 
   public async getUserById(userId: number): Promise<UserEntity> {

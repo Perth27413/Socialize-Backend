@@ -31,7 +31,7 @@ export class UserController {
     this.router.post('/following', this.getFollowingByUserId)
   }
   
-  public getAll = async (req: Request, res: Response<Array<UserEntity>>): Promise<void> => {
+  public getAll = async (req: Request, res: Response<Array<UserModel>>): Promise<void> => {
     const users = await this.userService.getAllUser()
     res.send(users).json()
   }
