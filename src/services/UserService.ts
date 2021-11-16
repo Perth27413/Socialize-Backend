@@ -186,8 +186,8 @@ export class UserService {
   public async login(request: LoginRequestModel): Promise<UserModel> {
     try {
       let result: UserEntity
-      if (request.typeId === 2) {
-        const user: Array<UserEntity> = await this.userRepository.find({where: {email: request.username, type: {id: request.typeId}}})
+      if (request.typeId === 2 || request.typeId === 3) {
+        const user: Array<UserEntity> = await this.userRepository.find({where: {email: request.username, type: {id: request.typeId}}, relations: ['type', 'role']})
         if (user.length) {
           return this.mapUserEntityToUserModel(user[0])
         }
@@ -206,7 +206,7 @@ export class UserService {
 
   public async register(request: RegisterRequestModel): Promise<UserModel> {
     try {
-      if (request.typeId === 2) {
+      if (request.typeId === 2 || request.typeId === 3) {
         const user: Array<UserEntity> = await this.userRepository.find({where: {email: request.email, type: {id: request.typeId}}, relations: ['type', 'role']})
         if (user.length) {
           console.log( this.mapUserEntityToUserModel(user[0]))
