@@ -200,11 +200,16 @@ export class UserService {
 
   public async register(request: RegisterRequestModel): Promise<UserModel> {
     try {
-      const isUserNameExist: boolean = await this.checkUserNameExist(request.username)
+      let isUserNameExist: boolean = false
+      if (request.username) {
+        isUserNameExist = await this.checkUserNameExist(request.username)
+      }
       if (!isUserNameExist) {
         let newUser: UserEntity = await this.mapRegisterRequestToUserEntity(request) as UserEntity
         const result: UserEntity = await this.userRepository.save(newUser)
-        if (result.id) this.mapUserEntityToUserModel(result)
+        if (result.id) {
+          return this.mapUserEntityToUserModel(result)
+        }
       }
     } catch (error) {
       console.error(error)
