@@ -186,6 +186,12 @@ export class UserService {
   public async login(request: LoginRequestModel): Promise<UserModel> {
     try {
       let result: UserEntity
+      if (request.typeId === 2) {
+        const user: Array<UserEntity> = await this.userRepository.find({where: {email: request.username, type: {id: request.typeId}}})
+        if (user.length) {
+          return this.mapUserEntityToUserModel(user[0])
+        }
+      }
       if (this.checkIsEmail(request.username)) {
         result = await this.userRepository.findOne({where: {email: request.username, password: request.password}, relations: ['type', 'role']}) as UserEntity
       } else {
