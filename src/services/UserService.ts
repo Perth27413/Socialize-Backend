@@ -107,8 +107,8 @@ export class UserService {
     try {
       const allUser: Array<UserModel> = await this.getAllUser()
       for await (const [index, item] of allUser.entries()) {
-        const follow: Array<FollowEntity> = await this.followRepository.find({where: {following: item.id, followed: currentUserId}})
-        if (follow.length) {
+        const follow: Array<FollowEntity> = await this.followRepository.find({where: {following: {id: item.id}, followed: {id: currentUserId}}})
+        if (follow.length || item.id === currentUserId) {
           allUser.splice(index, 1)
         }
       }
